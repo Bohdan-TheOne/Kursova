@@ -1,8 +1,8 @@
 #ifndef MATRIXES
 #define MATRIXES
 
-#include"CommonMatrix.cpp"
-#include "SparseMatrix.cpp"
+#include "CommonMatrix/CommonMatrix.cpp"
+#include "SparseMatrix/SparseMatrix.cpp"
 
 namespace Matrixes {
 
