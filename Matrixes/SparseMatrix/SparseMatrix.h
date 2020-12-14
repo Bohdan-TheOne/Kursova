@@ -1,7 +1,7 @@
 #ifndef SPARSE_MATRIX
 #define SPARSE_MATRIX
 #include<iostream>
-#include <jsoncpp/json/json.h>
+#include "../../json/json.h"
 
 using namespace std;
 
