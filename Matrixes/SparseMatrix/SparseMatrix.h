@@ -1,6 +1,7 @@
 #ifndef SPARSE_MATRIX
 #define SPARSE_MATRIX
 #include<iostream>
+#include <jsoncpp/json/json.h>
 
 using namespace std;
 
@@ -10,13 +11,15 @@ public:
 	SparseMatrixNode();
 	SparseMatrixNode(int _row, int _col, T _val);
 	SparseMatrixNode(const SparseMatrixNode& other);
-	~SparseMatrixNode();
 	void SetNode(int _row, int _col, T _val);
 	void SetCords(int _row, int _col);
 	void SetValue(T _val);
 	int GetRow() const;
 	int GetCol() const;
 	T GetValue() const;
+
+	void JsonSerialise(Json::Value& root);
+	void JsonDeserialise(Json::Value& root);
 
 	SparseMatrixNode<T> operator=(SparseMatrixNode<T> other);
 
@@ -45,8 +48,14 @@ public:
 	int GetColCount() const;
 	const SparseMatrixNode<T>* GetFirst() const;
 	void insert(SparseMatrixNode<T> newElem);
+	SparseMatrix<T> transpose() const;
+
+	void JsonSerialise(Json::Value& root);
+	void JsonDeserialise(Json::Value& root);
 
 	SparseMatrix<T> operator=(SparseMatrix<T> other);
+	SparseMatrix<T> operator+(SparseMatrix<T>& other);
+	SparseMatrix<T> operator*(SparseMatrix<T>& other);
 	friend std::ostream& operator<< <T>(std::ostream& os, const SparseMatrix<T>& matr);
 
 private:

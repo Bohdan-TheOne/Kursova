@@ -12,6 +12,12 @@ namespace Matrixes {
 
 		template <class T>
 		CommonMatrix<T> ToCommon(const SparseMatrix<T>& in, CommonMatrix<T>& out);
+
+		template <class T>
+		SparseMatrix<T> ToSparse(const CommonMatrix<T>& in);
+
+		template <class T>
+		CommonMatrix<T> ToCommon(const SparseMatrix<T>& in);
 	}
 
 }
