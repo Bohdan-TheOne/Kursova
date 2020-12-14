@@ -5,7 +5,7 @@ inline SparseMatrixNode<T>::SparseMatrixNode() {
 	row = 0;
 	col = 0;
 	value = 0;
-	next = nullptr;
+	next = NULL;
 }
 
 template<class T>
@@ -13,7 +13,7 @@ SparseMatrixNode<T>::SparseMatrixNode(int _row, int _col, T _val) {
 	row = _row;
 	col = _col;
 	value = _val;
-	next = nullptr;
+	next = NULL;
 }
 
 template<class T>
@@ -22,13 +22,6 @@ SparseMatrixNode<T>::SparseMatrixNode(const SparseMatrixNode& other) {
 	col = other.col;
 	value = other.value;
 	next = other.next;
-}
-
-template<class T>
-SparseMatrixNode<T>::~SparseMatrixNode() {
-	if (next) {
-		delete next;
-	}
 }
 
 template<class T>
@@ -145,9 +138,14 @@ SparseMatrix<T>::SparseMatrix(const SparseMatrix<T>& other) {
 
 template<class T>
 inline SparseMatrix<T>::~SparseMatrix() {
-	if (start) {
-		delete start;
+	SparseMatrixNode<T> *temp = start;
+	SparseMatrixNode<T> *ptr = start->next;
+	for (int i = 0; i < length - 1; ++i) {
+		delete temp;
+		temp = ptr;
+		ptr = ptr->next;
 	}
+	delete temp;
 }
 
 template<class T>
@@ -193,8 +191,13 @@ void SparseMatrix<T>::insert(SparseMatrixNode<T> newElem) {
 			return;
 		}
 	}
-
 	SparseMatrixNode<T>* ptr = start;
+	if (newElem.GetRow() < start->GetRow() || newElem.GetRow() == start->GetRow() && newElem.GetCol() < start->GetCol()) {
+		start = new SparseMatrixNode<T>(newElem);
+		start->next = ptr;
+		++length;
+		return;
+	}
 	while (newElem.GetRow() > ptr->next->GetRow() || newElem.GetRow() == ptr->next->GetRow() && newElem.GetCol() > ptr->next->GetCol()) {
 		ptr = ptr->next;
 		if (!ptr->next) {
@@ -210,6 +213,17 @@ void SparseMatrix<T>::insert(SparseMatrixNode<T> newElem) {
 	ptr->next = new SparseMatrixNode<T>(newElem);
 	ptr->next->next = temp;
 	++length;
+}
+
+template<class T>
+SparseMatrix<T> SparseMatrix<T>::transpose() const {
+	SparseMatrix<T> out(nCol, nRow);
+	SparseMatrixNode<T>* ptr = start;
+	for (int i = 0; i < length; ++i) {
+		out.insert(SparseMatrixNode<T>(ptr->GetCol(), ptr->GetRow(), ptr->GetValue()));
+		ptr = ptr->next;
+	}
+	return out;
 }
 
 template<class T>
@@ -231,6 +245,64 @@ SparseMatrix<T> SparseMatrix<T>::operator=(SparseMatrix<T> other) {
 	start = start->next;
 	return *this;
 }
+
+template<class T>
+SparseMatrix<T> SparseMatrix<T>::operator+(SparseMatrix<T> other) {
+	if (nRow != other.nRow || nCol != other.nCol) {
+		cout << "Matrixes cannot be added" << endl;
+		return SparseMatrix<T>();
+	}
+	SparseMatrix<T> out(nRow, nCol);
+	const SparseMatrixNode<T>* aPtr = start;
+	const SparseMatrixNode<T>* bPtr = other.GetFirst();
+	while (aPtr && bPtr) {
+		if (aPtr->GetRow() > bPtr->GetRow() ||
+			aPtr->GetRow() == bPtr->GetRow() &&
+			aPtr->GetCol() > bPtr->GetCol())
+		{
+			out.insert(*bPtr);
+			bPtr = bPtr->next;
+		}
+		else if (aPtr->GetRow() > bPtr->GetRow() ||
+			aPtr->GetRow() == bPtr->GetRow() &&
+			aPtr->GetCol() > bPtr->GetCol())
+		{
+			out.insert(*aPtr);
+			aPtr = aPtr->next;
+		}
+		else {
+			double addValue = aPtr->GetValue() + bPtr->GetValue();
+			if (addValue) {
+				out.insert(SparseMatrixNode<T>(aPtr->GetRow(), aPtr->GetCol(), addValue));
+			}
+			aPtr = aPtr->next;
+			bPtr = bPtr->next;
+		}
+	}
+	while (aPtr) {
+		out.insert(*aPtr);
+		aPtr = aPtr->next;
+	}
+	while (bPtr) {
+		out.insert(*bPtr);
+		bPtr = bPtr->next;
+	}
+
+	return out;
+}
+
+
+template<class T>
+SparseMatrix<T> SparseMatrix<T>::operator*(SparseMatrix<T> other) {
+	if (nRow != other.nCol || nCol != other.nRow) {
+		cout << "Matrixes cannot be multiplied" << endl;
+		return SparseMatrix<T>();
+	}
+	other = other.transpose();
+	SparseMatrixNode<T> aPtr, bPtr;
+
+}
+
 
 template <typename T>
 ostream& operator<<(ostream& os, const SparseMatrix<T>& matr) {

@@ -10,7 +10,6 @@ public:
 	SparseMatrixNode();
 	SparseMatrixNode(int _row, int _col, T _val);
 	SparseMatrixNode(const SparseMatrixNode& other);
-	~SparseMatrixNode();
 	void SetNode(int _row, int _col, T _val);
 	void SetCords(int _row, int _col);
 	void SetValue(T _val);
@@ -45,8 +44,11 @@ public:
 	int GetColCount() const;
 	const SparseMatrixNode<T>* GetFirst() const;
 	void insert(SparseMatrixNode<T> newElem);
+	SparseMatrix<T> transpose() const;
 
 	SparseMatrix<T> operator=(SparseMatrix<T> other);
+	SparseMatrix<T> operator+(SparseMatrix<T> other);
+	SparseMatrix<T> operator*(SparseMatrix<T> other);
 	friend std::ostream& operator<< <T>(std::ostream& os, const SparseMatrix<T>& matr);
 
 private:
