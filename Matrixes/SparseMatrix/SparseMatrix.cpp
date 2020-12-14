@@ -138,14 +138,16 @@ SparseMatrix<T>::SparseMatrix(const SparseMatrix<T>& other) {
 
 template<class T>
 inline SparseMatrix<T>::~SparseMatrix() {
-	SparseMatrixNode<T> *temp = start;
-	SparseMatrixNode<T> *ptr = start->next;
-	for (int i = 0; i < length - 1; ++i) {
+	if (start) {
+		SparseMatrixNode<T>* temp = start;
+		SparseMatrixNode<T>* ptr = start->next;
+		for (int i = 0; i < length - 1; ++i) {
+			delete temp;
+			temp = ptr;
+			ptr = ptr->next;
+		}
 		delete temp;
-		temp = ptr;
-		ptr = ptr->next;
 	}
-	delete temp;
 }
 
 template<class T>
@@ -294,13 +296,51 @@ SparseMatrix<T> SparseMatrix<T>::operator+(SparseMatrix<T> other) {
 
 template<class T>
 SparseMatrix<T> SparseMatrix<T>::operator*(SparseMatrix<T> other) {
-	if (nRow != other.nCol || nCol != other.nRow) {
+	if (nCol != other.nRow) {
 		cout << "Matrixes cannot be multiplied" << endl;
 		return SparseMatrix<T>();
 	}
 	other = other.transpose();
-	SparseMatrixNode<T> aPtr, bPtr;
+	SparseMatrix<T> out(nRow, other.nRow);
+	SparseMatrixNode<T>* aPtr,* bPtr;
 
+	aPtr = start;
+	while(aPtr) {
+		int curRow = aPtr->GetRow();
+
+		bPtr = other.start;
+		while (bPtr) {
+			int curCol = bPtr->GetRow();
+
+			SparseMatrixNode<T>* aTemp = aPtr;
+			SparseMatrixNode<T>* bTemp = bPtr;
+			T sum = 0;
+			while (aTemp && aTemp->GetRow() == curRow && bTemp && bTemp->GetRow() == curCol) {
+				if (aTemp->GetCol() < bTemp->GetCol()) {
+					aTemp = aTemp->next;
+				}
+				else if (aTemp->GetCol() > bTemp->GetCol()) {
+					bTemp = bTemp->next;
+				}
+				else {
+					sum += aTemp->GetValue() * bTemp->GetValue();
+					aTemp = aTemp->next;
+					bTemp = bTemp->next;
+				}
+			}
+			if (sum) {
+				out.insert(SparseMatrixNode<T>(curRow, curCol, sum));
+			}
+
+			while (bPtr && bPtr->GetRow() == curCol) {
+				bPtr = bPtr->next;
+			}
+		}
+		while (aPtr && aPtr->GetRow() == curRow) {
+			aPtr = aPtr->next;
+		}
+	}
+	return out;
 }
 
 
