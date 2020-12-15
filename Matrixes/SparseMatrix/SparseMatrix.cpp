@@ -1,7 +1,7 @@
 #include "SparseMatrix.h"
 
 template<class T>
-inline SparseMatrixNode<T>::SparseMatrixNode() {
+inline SparseMatrixNode<T>::SparseMatrixNode() {	// Initialise default values
 	row = 0;
 	col = 0;
 	value = 0;
@@ -9,7 +9,7 @@ inline SparseMatrixNode<T>::SparseMatrixNode() {
 }
 
 template<class T>
-SparseMatrixNode<T>::SparseMatrixNode(int _row, int _col, T _val) {
+SparseMatrixNode<T>::SparseMatrixNode(int _row, int _col, T _val) { // Initialise with defined values
 	row = _row;
 	col = _col;
 	value = _val;
@@ -17,61 +17,61 @@ SparseMatrixNode<T>::SparseMatrixNode(int _row, int _col, T _val) {
 }
 
 template<class T>
-SparseMatrixNode<T>::SparseMatrixNode(const SparseMatrixNode& other) {
+SparseMatrixNode<T>::SparseMatrixNode(const SparseMatrixNode& other) {	// Copy constructor
 	row = other.row;
 	col = other.col;
 	value = other.value;
-	next = other.next;
+	next = NULL;
 }
 
-template<class T>
+template<class T>	// Set all members of Node
 void SparseMatrixNode<T>::SetNode(int _row, int _col, T _val) {
 	row = _row;
 	col = _col;
 	value = _val;
 }
 
-template<class T>
+template<class T>	// Set coordinates of Node
 void SparseMatrixNode<T>::SetCords(int _row, int _col) {
 	row = _row;
 	col = _col;
 }
 
-template<class T>
+template<class T>	// Set value of Node
 void SparseMatrixNode<T>::SetValue(T _val) {
 	value = _val;
 }
 
-template<class T>
+template<class T>	// return node row index
 int SparseMatrixNode<T>::GetRow() const {
 	return row;
 }
 
-template<class T>
+template<class T>	// return node column index
 int SparseMatrixNode<T>::GetCol() const {
 	return col;
 }
 
-template<class T>
+template<class T>	// return node value
 T SparseMatrixNode<T>::GetValue() const {
 	return value;
 }
 
-template<class T>
-void SparseMatrixNode<T>::JsonSerialise(Json::Value& root) {
+template<class T>	// Serialise node to json format
+void SparseMatrixNode<T>::JsonSerialise(Json::Value& root) const {
 	root["row"] = row;
 	root["col"] = col;
 	root["value"] = value;
 }
 
-template<class T>
+template<class T>	// Deserialise node form json format
 void SparseMatrixNode<T>::JsonDeserialise(Json::Value& root) {	
 	row = root.get("row", 0).asInt();
 	col = root.get("col", 0).asInt();
 	value = root.get("value", 0).asDouble();
 }
 
-template<class T>
+template<class T>	// Assign operator overload
 SparseMatrixNode<T> SparseMatrixNode<T>::operator=(SparseMatrixNode<T> other) {
 	row = other.row;
 	col = other.col;
@@ -80,7 +80,7 @@ SparseMatrixNode<T> SparseMatrixNode<T>::operator=(SparseMatrixNode<T> other) {
 	return *this;
 }
 
-template<class T>
+template<class T>	// Initialise default values
 inline SparseMatrix<T>::SparseMatrix() {
 	length = 0;
 	nRow = 0;
@@ -88,11 +88,12 @@ inline SparseMatrix<T>::SparseMatrix() {
 	start = nullptr;
 }
 
-template<class T>
+template<class T>	// Initialise with pointer to first element of list
 inline SparseMatrix<T>::SparseMatrix(SparseMatrixNode<T>* first) {
 	start = first;
 	length = 0;
 
+	// determine row and column count
 	int maxRow = 0, maxCol = 0;
 	SparseMatrixNode<T>* ptr = first;
 	while (ptr) {
@@ -109,7 +110,7 @@ inline SparseMatrix<T>::SparseMatrix(SparseMatrixNode<T>* first) {
 	nCol = maxCol + 1;
 }
 
-template<class T>
+template<class T>	// Initialise with pointer to first element of list and max dimentions
 SparseMatrix<T>::SparseMatrix(SparseMatrixNode<T>* first, int rowCount, int colCount) {
 	SparseMatrixNode<T>* ptrThis = new SparseMatrixNode<T>();
 	SparseMatrixNode<T>* ptrOther = first;
@@ -126,7 +127,7 @@ SparseMatrix<T>::SparseMatrix(SparseMatrixNode<T>* first, int rowCount, int colC
 	nCol = colCount;
 }
 
-template<class T>
+template<class T>	// Create matrix with all zero elements
 SparseMatrix<T>::SparseMatrix(int rowCount, int colCount) {
 	length = 0;
 	nRow = rowCount;
@@ -134,7 +135,7 @@ SparseMatrix<T>::SparseMatrix(int rowCount, int colCount) {
 	start = nullptr;
 }
 
-template<class T>
+template<class T>	// Copy constructor
 SparseMatrix<T>::SparseMatrix(const SparseMatrix<T>& other) {
 	length = other.length;
 	nRow = other.nRow;
@@ -152,49 +153,44 @@ SparseMatrix<T>::SparseMatrix(const SparseMatrix<T>& other) {
 
 template<class T>
 inline SparseMatrix<T>::~SparseMatrix() {
-	if (start) {
-		SparseMatrixNode<T>* temp = start;
-		SparseMatrixNode<T>* ptr = start->next;
-		for (int i = 0; i < length - 1; ++i) {
-			delete temp;
-			temp = ptr;
-			ptr = ptr->next;
-		}
-		delete temp;
-	}
+	clearMatrix();
 }
 
-template<class T>
+template<class T>	// return number of non-zero elements
 int SparseMatrix<T>::GetLength() const {
 	return length;
 }
 
-template<class T>
+template<class T>	// return number of rows
 int SparseMatrix<T>::GetRowCount() const {
 	return nRow;
 }
 
-template<class T>
+template<class T>	// return number of columns
 int SparseMatrix<T>::GetColCount() const {
 	return nCol;
 }
 
-template<class T>
+template<class T>	// returns pointer to first element
 const SparseMatrixNode<T>* SparseMatrix<T>::GetFirst() const {
 	return start;
 }
 
-template<class T>
+template<class T>	// add new non-zero value to matrix
 void SparseMatrix<T>::insert(SparseMatrixNode<T> newElem) {
-	if (newElem.GetRow() >= nRow || newElem.GetCol() >= nCol) {
+	if (newElem.GetRow() >= nRow || newElem.GetCol() >= nCol) {	// Check if index is in range
 		cout << "Index out of range" << endl;
 		return;
 	}
-	if (!length) {
+	else if (!newElem.GetValue()) { // Matrix can`t store zero values
+		cout << "Element has zero value" << endl;
+		return;
+	}
+	if (!length) {	// if Matrix is void
 		start = new SparseMatrixNode<T>(newElem);
 		++length;
 		return;
-	} else if (length == 1) {
+	} else if (length == 1) {	// if Matrix has one element
 		if (newElem.GetRow() > start->GetRow() || newElem.GetRow() == start->GetRow() && newElem.GetCol() > start->GetCol()) {
 			start->next = new SparseMatrixNode<T>(newElem);
 			++length;
@@ -207,7 +203,7 @@ void SparseMatrix<T>::insert(SparseMatrixNode<T> newElem) {
 			return;
 		}
 	}
-	SparseMatrixNode<T>* ptr = start;
+	SparseMatrixNode<T>* ptr = start;	// set pointer for iteration
 	if (newElem.GetRow() < start->GetRow() || newElem.GetRow() == start->GetRow() && newElem.GetCol() < start->GetCol()) {
 		start = new SparseMatrixNode<T>(newElem);
 		start->next = ptr;
@@ -220,7 +216,7 @@ void SparseMatrix<T>::insert(SparseMatrixNode<T> newElem) {
 			break;
 		}
 	}
-	if (ptr->next)
+	if (ptr->next)	// ELement exists, so can`t be added
 		if (newElem.GetRow() == ptr->next->GetRow() && newElem.GetCol() == ptr->next->GetCol()) {
 		cout << "Element already exist" << endl;
 		return;
@@ -228,27 +224,42 @@ void SparseMatrix<T>::insert(SparseMatrixNode<T> newElem) {
 	SparseMatrixNode<T>* temp = ptr->next;
 	ptr->next = new SparseMatrixNode<T>(newElem);
 	ptr->next->next = temp;
-	++length;
+	++length;	// increment number of non-zero elements
 }
 
-template<class T>
+template<class T>	// return transposed matrix
 SparseMatrix<T> SparseMatrix<T>::transpose() const {
 	SparseMatrix<T> out(nCol, nRow);
 	SparseMatrixNode<T>* ptr = start;
-	for (int i = 0; i < length; ++i) {
+	for (int i = 0; i < length; ++i) {	// insert elements one by one to new matrix
 		out.insert(SparseMatrixNode<T>(ptr->GetCol(), ptr->GetRow(), ptr->GetValue()));
 		ptr = ptr->next;
 	}
 	return out;
 }
 
-template<class T>
-void SparseMatrix<T>::JsonSerialise(Json::Value& root) {
+template<class T>	// clear data list
+void SparseMatrix<T>::clearMatrix() {
+	if (start) {	// Check if matrix was initialised
+		SparseMatrixNode<T>* temp = start;
+		SparseMatrixNode<T>* ptr = start->next;
+		for (int i = 0; i < length - 1; ++i) {	// Delete all nodes
+			delete temp;
+			temp = ptr;
+			ptr = ptr->next;
+		}
+		delete temp;
+	}
+}
+
+
+template<class T>	// Serialise matrix to json format
+void SparseMatrix<T>::JsonSerialise(Json::Value& root) const {
 	if (length) {
 		root["rowNumber"] = nRow;
 		root["columnNumber"] = nCol;
 		root["lenth"] = length;
-		Json::Value valList;
+		Json::Value valList;	// Save node list as json array
 		SparseMatrixNode<T>* ptr = start;
 		for (int i = 0; i < length; ++i) {
 			ptr->JsonSerialise(valList[i]);
@@ -258,8 +269,9 @@ void SparseMatrix<T>::JsonSerialise(Json::Value& root) {
 	}
 }
 
-template<class T>
+template<class T>	// Deserialise matrix from json format
 void SparseMatrix<T>::JsonDeserialise(Json::Value& root) {
+	clearMatrix();
 	nRow = root.get("rowNumber", 0).asInt();
 	nCol = root.get("columnNumber", 0).asInt();
 	length = root.get("lenth", 0).asInt();
@@ -268,7 +280,7 @@ void SparseMatrix<T>::JsonDeserialise(Json::Value& root) {
 	SparseMatrixNode<T>* temp = new SparseMatrixNode<T>();
 	Json::Value valList = root["data"];
 	start = ptrThis;
-	for (int i = 0; i < length; ++i) {
+	for (int i = 0; i < length; ++i) {	// read elements of json array
 		temp->JsonDeserialise(valList[i]);
 		ptrThis->next = new SparseMatrixNode<T>(temp->GetRow(), temp->GetCol(), temp->GetValue());
 		ptrThis = ptrThis->next;
@@ -276,18 +288,16 @@ void SparseMatrix<T>::JsonDeserialise(Json::Value& root) {
 	start = start->next;
 }
 
-template<class T>
+template<class T>	// assign operator overload
 SparseMatrix<T> SparseMatrix<T>::operator=(SparseMatrix<T> other) {
-	if (start) {
-		delete start;
-	}
+	clearMatrix();	// if matrix already existed
 	length = other.length;
 	nRow = other.nRow;
 	nCol = other.nCol;
 	SparseMatrixNode<T>* ptrThis = new SparseMatrixNode<T>();
 	SparseMatrixNode<T>* ptrOther = other.start;
 	start = ptrThis;
-	for (int i = 0; i < other.length; ++i) {
+	for (int i = 0; i < other.length; ++i) {	// Copy elements one by one
 		ptrThis->next = new SparseMatrixNode<T>(ptrOther->GetRow(), ptrOther->GetCol(), ptrOther->GetValue());
 		ptrThis = ptrThis->next;
 		ptrOther = ptrOther->next;
@@ -296,31 +306,31 @@ SparseMatrix<T> SparseMatrix<T>::operator=(SparseMatrix<T> other) {
 	return *this;
 }
 
-template<class T>
+template<class T>	//	Addition operator overload
 SparseMatrix<T> SparseMatrix<T>::operator+(SparseMatrix<T>& other) {
-	if (nRow != other.nRow || nCol != other.nCol) {
+	if (nRow != other.nRow || nCol != other.nCol) {	// Check if matrixes have same size
 		cout << "Matrixes cannot be added" << endl;
 		return SparseMatrix<T>();
 	}
 	SparseMatrix<T> out(nRow, nCol);
 	const SparseMatrixNode<T>* aPtr = start;
 	const SparseMatrixNode<T>* bPtr = other.GetFirst();
-	while (aPtr && bPtr) {
+	while (aPtr && bPtr) {	// Iterate through both matrixes
 		if (aPtr->GetRow() > bPtr->GetRow() ||
 			aPtr->GetRow() == bPtr->GetRow() &&
 			aPtr->GetCol() > bPtr->GetCol())
-		{
-			out.insert(*bPtr);
+		{	// if first has non-zero value with lower index
+			out.insert(SparseMatrixNode<T>(*bPtr));
 			bPtr = bPtr->next;
 		}
 		else if (aPtr->GetRow() > bPtr->GetRow() ||
 			aPtr->GetRow() == bPtr->GetRow() &&
 			aPtr->GetCol() > bPtr->GetCol())
-		{
-			out.insert(*aPtr);
+		{	// if second has non-zero value with lower index
+			out.insert(SparseMatrixNode<T>(*aPtr));
 			aPtr = aPtr->next;
 		}
-		else {
+		else {	// if both have non-zero value with same index
 			double addValue = aPtr->GetValue() + bPtr->GetValue();
 			if (addValue) {
 				out.insert(SparseMatrixNode<T>(aPtr->GetRow(), aPtr->GetCol(), addValue));
@@ -329,11 +339,11 @@ SparseMatrix<T> SparseMatrix<T>::operator+(SparseMatrix<T>& other) {
 			bPtr = bPtr->next;
 		}
 	}
-	while (aPtr) {
+	while (aPtr) {	// Add rest nodes of first matrix (if any)
 		out.insert(*aPtr);
 		aPtr = aPtr->next;
 	}
-	while (bPtr) {
+	while (bPtr) {	// Add rest nodes of second matrix (if any)
 		out.insert(*bPtr);
 		bPtr = bPtr->next;
 	}
@@ -342,27 +352,29 @@ SparseMatrix<T> SparseMatrix<T>::operator+(SparseMatrix<T>& other) {
 }
 
 
-template<class T>
-SparseMatrix<T> SparseMatrix<T>::operator*(SparseMatrix<T>& other) {
-	if (nCol != other.nRow) {
+template<class T>	//	Multiplication operator overload
+SparseMatrix<T> SparseMatrix<T>::operator*(SparseMatrix<T>& second) {
+	if (nCol != second.nRow) {
 		cout << "Matrixes cannot be multiplied" << endl;
 		return SparseMatrix<T>();
 	}
-	other = other.transpose();
+	SparseMatrix<T> other = second.transpose();	// Transpose for better efficiency
 	SparseMatrix<T> out(nRow, other.nRow);
-	SparseMatrixNode<T>* aPtr,* bPtr;
+	SparseMatrixNode<T>* aPtr,* bPtr;	// Pointers to store current position
 
 	aPtr = start;
-	while(aPtr) {
+	while(aPtr) {	// Iterate through first matrixes rows
 		int curRow = aPtr->GetRow();
 
 		bPtr = other.start;
-		while (bPtr) {
+		while (bPtr) {	// Iterate through second matrixes columns
 			int curCol = bPtr->GetRow();
 
 			SparseMatrixNode<T>* aTemp = aPtr;
 			SparseMatrixNode<T>* bTemp = bPtr;
 			T sum = 0;
+
+			// find non-zero elements to multiply
 			while (aTemp && aTemp->GetRow() == curRow && bTemp && bTemp->GetRow() == curCol) {
 				if (aTemp->GetCol() < bTemp->GetCol()) {
 					aTemp = aTemp->next;
@@ -370,20 +382,22 @@ SparseMatrix<T> SparseMatrix<T>::operator*(SparseMatrix<T>& other) {
 				else if (aTemp->GetCol() > bTemp->GetCol()) {
 					bTemp = bTemp->next;
 				}
-				else {
+				else {	// both elements are non-zero
 					sum += aTemp->GetValue() * bTemp->GetValue();
 					aTemp = aTemp->next;
 					bTemp = bTemp->next;
 				}
 			}
-			if (sum) {
+			if (sum) {	//	add new elemente to resulting matrix
 				out.insert(SparseMatrixNode<T>(curRow, curCol, sum));
 			}
 
+			// Move to next column
 			while (bPtr && bPtr->GetRow() == curCol) {
 				bPtr = bPtr->next;
 			}
 		}
+		// Move to next row
 		while (aPtr && aPtr->GetRow() == curRow) {
 			aPtr = aPtr->next;
 		}
