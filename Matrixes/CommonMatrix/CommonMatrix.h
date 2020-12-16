@@ -2,7 +2,7 @@
 #define MY_MATRIX
 
 #include<iostream>
-#include <jsoncpp/json/json.h>
+#include "../../json/json.h"
 
 template <typename T> class CommonMatrix;
 template <typename T> std::ostream& operator<<(std::ostream& os, const CommonMatrix<T>& matr);

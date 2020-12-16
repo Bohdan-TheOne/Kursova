@@ -3,7 +3,7 @@
 #include <time.h>
 #include <fstream>
 
-int main(void) {
+int dmain(void) {
 	SparseMatrix<float> matrix = SparseMatrix<float>(13, 17);
 	srand(time(NULL));
 	for (int i = 1; i < 10; ++i) {

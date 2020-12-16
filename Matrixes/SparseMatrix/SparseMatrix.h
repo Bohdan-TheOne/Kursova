@@ -2,7 +2,7 @@
 #define SPARSE_MATRIX
 
 #include <iostream>
-#include <jsoncpp/json/json.h>
+#include "../../json/json.h" // Is used for saving in json file
 
 using namespace std;
 

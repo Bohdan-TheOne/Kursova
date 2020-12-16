@@ -271,21 +271,21 @@ void SparseMatrix<T>::JsonSerialise(Json::Value& root) const {
 
 template<class T>	// Deserialise matrix from json format
 void SparseMatrix<T>::JsonDeserialise(Json::Value& root) {
-	clearMatrix();
-	nRow = root.get("rowNumber", 0).asInt();
-	nCol = root.get("columnNumber", 0).asInt();
-	length = root.get("lenth", 0).asInt();
+		clearMatrix();
+		nRow = root.get("rowNumber", 0).asInt();
+		nCol = root.get("columnNumber", 0).asInt();
+		length = root.get("lenth", 0).asInt();
 
-	SparseMatrixNode<T>* ptrThis = new SparseMatrixNode<T>();
-	SparseMatrixNode<T>* temp = new SparseMatrixNode<T>();
-	Json::Value valList = root["data"];
-	start = ptrThis;
-	for (int i = 0; i < length; ++i) {	// read elements of json array
-		temp->JsonDeserialise(valList[i]);
-		ptrThis->next = new SparseMatrixNode<T>(temp->GetRow(), temp->GetCol(), temp->GetValue());
-		ptrThis = ptrThis->next;
-	}
-	start = start->next;
+		SparseMatrixNode<T>* ptrThis = new SparseMatrixNode<T>();
+		SparseMatrixNode<T>* temp = new SparseMatrixNode<T>();
+		Json::Value valList = root["data"];
+		start = ptrThis;
+		for (int i = 0; i < length; ++i) {	// read elements of json array
+			temp->JsonDeserialise(valList[i]);
+			ptrThis->next = new SparseMatrixNode<T>(temp->GetRow(), temp->GetCol(), temp->GetValue());
+			ptrThis = ptrThis->next;
+		}
+		start = start->next;
 }
 
 template<class T>	// assign operator overload
