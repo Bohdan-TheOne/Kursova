@@ -122,7 +122,9 @@ SparseMatrix<T>::SparseMatrix(SparseMatrixNode<T>* first, int rowCount, int colC
 		ptrOther = ptrOther->next;
 		ptrThis = ptrThis->next;
 	}
+	SparseMatrixNode<T>* tmp = start;
 	start = start->next;
+	delete tmp;	
 	nRow = rowCount;
 	nCol = colCount;
 }
@@ -148,7 +150,9 @@ SparseMatrix<T>::SparseMatrix(const SparseMatrix<T>& other) {
 		ptrThis = ptrThis->next;
 		ptrOther = ptrOther->next;
 	}
-	start = start->next;
+	SparseMatrixNode<T>* tmp = start;
+	start = start->next;		
+	delete tmp;		
 }
 
 template<class T>
@@ -284,8 +288,11 @@ void SparseMatrix<T>::JsonDeserialise(Json::Value& root) {
 		temp->JsonDeserialise(valList[i]);
 		ptrThis->next = new SparseMatrixNode<T>(temp->GetRow(), temp->GetCol(), temp->GetValue());
 		ptrThis = ptrThis->next;
-	}
-	start = start->next;
+	}            
+	SparseMatrixNode<T>* tmp = start;
+    start = start->next;
+	delete tmp; 
+
 }
 
 template<class T>	// assign operator overload
@@ -302,7 +309,9 @@ SparseMatrix<T> SparseMatrix<T>::operator=(SparseMatrix<T> other) {
 		ptrThis = ptrThis->next;
 		ptrOther = ptrOther->next;
 	}
-	start = start->next;
+	SparseMatrixNode<T>* tmp = start;
+	start = start->next;		
+	delete tmp;
 	return *this;
 }
 
