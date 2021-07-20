@@ -7,19 +7,12 @@
 namespace Matrixes {
 
 	namespace Convert {
-		template <class T>
-		SparseMatrix<T> ToSparse(const CommonMatrix<T>& in, SparseMatrix<T>& out);
-
-		template <class T>
-		CommonMatrix<T> ToCommon(const SparseMatrix<T>& in, CommonMatrix<T>& out);
-
-		template <class T>
+		template <class T>	// Convert commot matrix to sparse
 		SparseMatrix<T> ToSparse(const CommonMatrix<T>& in);
 
-		template <class T>
+		template <class T>	// Convert sparse matrix to common
 		CommonMatrix<T> ToCommon(const SparseMatrix<T>& in);
 	}
-
 }
 
 #endif
